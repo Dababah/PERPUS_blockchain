@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Library - Blockchain System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=6">
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.jpg" alt="Logo" class="logo">
+                <div>
+                    <h2>Smart Library</h2>
+                    <span>Blockchain System</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-target="books">
+                    <i class="fas fa-book-open"></i>
+                    <span>Books Catalog</span>
+                </a>
+                <a href="#" class="nav-item" data-target="history">
+                    <i class="fas fa-history"></i>
+                    <span>Borrow History</span>
+                </a>
+                <a href="#" class="nav-item" data-target="admin" id="adminNavLink" style="display: none;">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>SmartBook Chain v1.0</p>
+                <small>Powered by Sepolia</small>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1 id="pageTitle">Smart Library</h1>
+                    <p class="subtitle">Decentralized Library System on Sepolia</p>
+                </div>
+
+                <div class="user-actions">
+                    <div id="walletInfo">
+                        <button id="connectWallet" class="btn btn-primary">
+                            <i class="fas fa-wallet"></i> Connect Wallet
+                        </button>
+                        <div id="accountInfo" style="display: none; align-items: center; gap: 10px;">
+                            <span id="userRole" class="status-badge status-available"
+                                style="display: none; font-size: 0.8rem;">User</span>
+                            <span id="memberStatus" class="status-badge status-out"
+                                style="display: none; font-size: 0.8rem;">Guest</span>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="accountAddress">0x...</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Global Message -->
+            <div id="globalMessage" class="message-toast" style="display: none;"></div>
+
+            <!-- Content Wrapper -->
+            <div class="content-wrapper">
+
+                <!-- Dashboard / Stats Section -->
+                <section id="statsSection" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Total Books</span>
+                                <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                            </div>
+                            <div class="stat-value" id="totalBooks">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Total Members</span>
+                                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            </div>
+                            <div class="stat-value" id="totalMembers">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Total Borrows</span>
+                                <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                            </div>
+                            <div class="stat-value" id="totalBorrows">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label">Active Loans</span>
+                                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            </div>
+                            <div class="stat-value" id="activeLoans">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Welcome / Connect Prompt -->
+                    <div id="welcomeCard" class="welcome-card">
+                        <div class="welcome-icon"><i class="fas fa-book-reader"></i></div>
+                        <h2>Welcome to Smart Library</h2>
+                        <p>Connect your wallet to access the decentralized library system</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('connectWallet').click()">
+                            Please connect your wallet to continue
+                        </button>
+                    </div>
+
+                    <!-- Registration Widget (Hidden by default) -->
+                    <div id="registrationSection" class="welcome-card" style="display: none; margin-top: 30px;">
+                        <div class="welcome-icon"><i class="fas fa-user-plus"></i></div>
+                        <h2>Join the Library</h2>
+                        <p>Register as a member to start borrowing books</p>
+                        <div class="form-group" style="max-width: 400px; margin: 0 auto 20px;">
+                            <input type="text" id="memberName" placeholder="Enter your full name" class="input-field"
+                                style="text-align: center;">
+                        </div>
+                        <button id="registerBtn" class="btn btn-primary">Register Now</button>
+                        <div id="registerMessage" class="message"></div>
+                    </div>
+
+                    <!-- My Current Borrow (Hidden by default) -->
+                    <div id="currentBorrowSection" style="display: none; margin-top: 30px;">
+                        <h3 style="margin-bottom: 20px;">My Current Borrow</h3>
+                        <div id="currentBorrowInfo"></div>
+                    </div>
+                </section>
+
+                <!-- Books Catalog Section -->
+                <section id="booksSection" class="content-section">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search books by title or author..." class="search-input">
+                        </div>
+                    </div>
+
+                    <div id="loadingBooks" class="loading">
+                        <p>Loading books from blockchain...</p>
+                    </div>
+
+                    <div id="booksList" class="books-grid">
+                        <!-- Books populated by JS -->
+                    </div>
+
+                    <div id="noBooksMessage" style="display: none; text-align: center; padding: 40px;">
+                        <p>No books available.</p>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section id="historySection" class="content-section">
+                    <div style="margin-bottom: 30px;">
+                        <button id="showAllHistory" class="btn btn-primary">All History</button>
+                        <button id="showMyHistory" class="btn btn-secondary">My History</button>
+                    </div>
+
+                    <div id="loadingHistory" class="loading">
+                        <p>Loading history...</p>
+                    </div>
+
+                    <div id="historyList" class="history-list">
+                        <!-- History cards populated by JS -->
+                    </div>
+
+                    <div id="noHistoryMessage" style="display: none; text-align: center; padding: 40px;">
+                        <p>No borrow history found.</p>
+                    </div>
+                </section>
+
+                <!-- Admin Panel Section -->
+                <section id="adminPanel" class="content-section" style="display: none;">
+                    <div class="admin-grid">
+                        <!-- Add Book Card -->
+                        <div class="stat-card" style="padding: 0; border: 1px solid var(--border);">
+                            <div class="card-header">
+                                <h2><i class="fas fa-plus-circle"></i> Add New Book</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="quickFill" style="color: var(--text-muted);">Quick Fill (From
+                                        app.js)</label>
+                                    <select id="quickFill" class="input-field" style="background: rgba(0, 0, 0, 0.2);">
+                                        <option value="">-- Select a Book --</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ipfsHash">IPFS CID</label>
+                                    <input type="text" id="ipfsHash" placeholder="Qm..." class="input-field">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookStock">Stock</label>
+                                    <input type="number" id="bookStock" placeholder="5" min="1" class="input-field">
+                                </div>
+                                <button id="addBookBtn" class="btn btn-primary btn-full">
+                                    Add to Blockchain
+                                </button>
+                                <div id="adminMessage" class="message"></div>
+                            </div>
+                        </div>
+
+                        <!-- Member List Card -->
+                        <div class="stat-card" style="padding: 0; border: 1px solid var(--border);">
+                            <div class="card-header">
+                                <h2><i class="fas fa-users"></i> Registered Members</h2>
+                            </div>
+                            <div class="card-body">
+                                <table id="membersTable"
+                                    style="width: 100%; text-align: left; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid var(--border);">
+                                            <th style="padding: 10px; color: var(--text-muted);">Name</th>
+                                            <th style="padding: 10px; color: var(--text-muted);">Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="membersListBody">
+                                        <!-- Rows populated by JS -->
+                                    </tbody>
+                                </table>
+                                <div id="loadingMembers" style="display: none; padding: 20px; text-align: center;">
+                                    Loading...</div>
+                                <div id="noMembersMessage" style="display: none; padding: 20px; text-align: center;">No
+                                    members found.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Web3 and App Script -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <script src="app.js?v=7"></script>
+
+    <!-- Navigation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('pageTitle');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Remove active class from all
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    sections.forEach(sec => {
+                        sec.classList.remove('active');
+                        sec.style.display = 'none';
+                    });
+
+                    // Add active class to clicked
+                    item.classList.add('active');
+
+                    // Show target section
+                    const targetId = item.getAttribute('data-target');
+                    let targetSectionId;
+                    let titleText;
+
+                    switch (targetId) {
+                        case 'dashboard':
+                            targetSectionId = 'statsSection';
+                            titleText = 'Smart Library';
+                            break;
+                        case 'books':
+                            targetSectionId = 'booksSection';
+                            titleText = 'Books Catalog';
+                            break;
+                        case 'history':
+                            targetSectionId = 'historySection';
+                            titleText = 'Borrow History';
+                            break;
+                        case 'admin':
+                            targetSectionId = 'adminPanel';
+                            titleText = 'Admin Panel';
+                            break;
+                    }
+
+                    const targetSection = document.getElementById(targetSectionId);
+                    if (targetSection) {
+                        targetSection.style.display = 'block';
+                        setTimeout(() => targetSection.classList.add('active'), 10);
+                        pageTitle.textContent = titleText;
+                    }
+                });
+            });
+
+            // Initial State
+            document.getElementById('statsSection').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
